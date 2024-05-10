@@ -1,8 +1,7 @@
 import sys
 
-def parse_log_line(line):
+def parse_log_line(line: str) -> dict:
     parts = line.split(" ", 3)
-
     if len(parts) != 4:
         raise ValueError("Неправильний формат рядка лог-файлу.")
 
@@ -14,23 +13,26 @@ def parse_log_line(line):
         "message": message.strip()  
     }
 
-def load_logs(file_path):
+def load_logs(file_path: str) -> list:
     logs = []
     try:
         with open(file_path, 'r') as file:
             for line in file:
                 parsed_line = parse_log_line(line) 
                 logs.append(parsed_line)  
+    except FileNotFoundError:
+        print("Файл не знайдено")
+        return
     except Exception as e:
         print(f"Помилка при завантаженні лог-файлу: {e}")
-        raise
+        return
 
     return logs
 
-def filter_logs_by_level(logs, level):
+def filter_logs_by_level(logs: list, level: str) -> list:
     return [log for log in logs if log['level'] == level.upper()]  
 
-def count_logs_by_level(logs):
+def count_logs_by_level(logs: list) -> dict:
     counts = {}  
     for log in logs:
         level = log['level']
@@ -40,7 +42,7 @@ def count_logs_by_level(logs):
             counts[level] = 1
     return counts
 
-def display_log_counts(counts):
+def display_log_counts(counts: dict):
     print("Рівень логування | Кількість")
     print("-----------------|----------")
     for level, count in counts.items():
@@ -51,12 +53,13 @@ def main():
         print("Вкажіть шлях до лог-файлу як аргумент командного рядка.")
         return
     
-    file_path = sys.argv[1]
-    logs = load_logs(file_path)  
-
-    counts = count_logs_by_level(logs)
-    
-    display_log_counts(counts)
+    try:
+        file_path = sys.argv[1]
+        logs = load_logs(file_path)  
+        counts = count_logs_by_level(logs)
+        display_log_counts(counts)
+    except Exception:
+        return "Error"
     
     if len(sys.argv) > 2:
         level = sys.argv[2].upper()  
