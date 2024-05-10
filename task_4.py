@@ -1,5 +1,5 @@
 def input_error(func):
-    def inner(*args, **kwargs):
+    def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except KeyError:
@@ -10,7 +10,7 @@ def input_error(func):
             return "Please provide the correct number of arguments."
         except Exception:
             return "An unexpected error occurred. Please try again."
-    return inner
+    return wrapper
 
 @input_error
 def parse_input(user_input):
